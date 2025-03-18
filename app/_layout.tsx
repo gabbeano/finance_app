@@ -4,8 +4,10 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Provider } from 'react-redux';
 
 import { useColorScheme } from '@/components/useColorScheme';
+import { store } from './state/store';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -41,6 +43,7 @@ export default function RootLayout() {
     return null;
   }
 
+  // TO DO add Provider react-redux 
   return <RootLayoutNav />;
 }
 
@@ -48,11 +51,13 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        </Stack>
+      </ThemeProvider>
+    </Provider>
   );
 }
