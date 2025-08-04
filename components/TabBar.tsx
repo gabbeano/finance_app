@@ -3,6 +3,8 @@ import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Link } from 'expo-router';
 import { Pressable } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import AntDesign from '@expo/vector-icons/AntDesign';
+
 
 
 import Colors from '@/constants/Colors';
@@ -46,19 +48,24 @@ export default function TabBar({ state, descriptors, navigation }) {
 
         if (route.name === "addExpense") {
             return (
-                <Link href="/modal" asChild>
-                    <Pressable>
-                        {({ pressed }) => (
-                        <FontAwesome
-                            name="info-circle"
-                            size={25}
-                            color='light'
-                            // color={Colors[colorScheme ?? 'light'].text}
-                            style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                        />
-                        )}
-                    </Pressable>
-                </Link>
+              <Link href="/modal" asChild>
+                <Pressable>
+                  {({ pressed }) => (
+                    <View style={[
+                      // { borderColor: pressed ? 'rgba(0,0,0,.5)' : 'black' },
+                      styles.addButton
+                    ]}>
+                      <AntDesign
+                        name="pluscircleo"
+                        size={60}
+                        color='rgb(40 40 40)'
+                        // color={Colors[colorScheme ?? 'light'].text}
+                        style={{ opacity: pressed ? 0.5 : 1 }}
+                      />
+                    </View>
+                  )}
+                </Pressable>
+              </Link>
             )
         }
 
@@ -70,7 +77,7 @@ export default function TabBar({ state, descriptors, navigation }) {
             testID={options.tabBarButtonTestID}
             onPress={onPress}
             onLongPress={onLongPress}
-            style={{ flex: 1 }}
+            style={styles.tab}
           >
             <Text style={{ color: isFocused ? "blue" : "gray" }}>
               {label}
@@ -83,4 +90,18 @@ export default function TabBar({ state, descriptors, navigation }) {
 }
 
 const styles = StyleSheet.create({
+  tab: {
+    flex: 1,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 20,
+  },
+  addButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 50,
+    marginTop: -30,
+    backgroundColor: 'white'
+  }
 });
