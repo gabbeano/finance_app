@@ -4,10 +4,37 @@ import { Link } from 'expo-router';
 import { Pressable } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+
 
 
 
 import Colors from '@/constants/Colors';
+
+const tabIcons = [
+  {
+    id: 0,
+    icon: () => <Ionicons name="home-outline" size={24} color="rgb(40 40 40)" />,
+    iconFocused: () => <Ionicons name="home" size={24} color="rgb(150 150 150)" />
+  },
+  {
+    id: 1,
+    icon: () => <SimpleLineIcons name="graph" size={24} color="rgb(40 40 40)" />,
+    iconFocused: () => <SimpleLineIcons name="graph" size={24} color="rgb(150 150 150)" />
+  },
+  {
+    id: 3,
+    icon: () => <MaterialIcons name="category" size={24} color="rgb(40 40 40)" />,
+    iconFocused: () => <MaterialIcons name="category" size={24} color="rgb(150 150 150)" />
+  },
+  {
+    id: 4,
+    icon: () => <Ionicons name="settings-outline" size={24} color="rgb(40 40 40)" />,
+    iconFocused: () => <Ionicons name="settings" size={24} color="rgb(150 150 150)" />
+  }
+]
 
 export default function TabBar({ state, descriptors, navigation }) {
     // const { buildHref } = useLinkBuilder();
@@ -78,10 +105,14 @@ export default function TabBar({ state, descriptors, navigation }) {
             onPress={onPress}
             onLongPress={onLongPress}
             style={styles.tab}
+            key={index}
           >
-            <Text style={{ color: isFocused ? "blue" : "gray" }}>
-              {label}
-            </Text>
+
+            {tabIcons
+              .filter(item => item.id === index)
+              .map(item => isFocused ? item.iconFocused() : item.icon()
+            )}
+
           </TouchableOpacity>
         );
       })}
