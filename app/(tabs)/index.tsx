@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, ListRenderItem } from 'react-native';
+import { FlatList, SectionList, StyleSheet, ListRenderItem } from 'react-native';
 import moment from 'moment';
 import "react-native-devsettings";
 
@@ -34,6 +34,29 @@ const expenses: ItemExpenses[] = [
   }
 ]
 
+const groupedExpenses = () => {
+  const groups: Record<string, Record<string, ItemExpenses[]>> = {};
+
+  expenses.forEach(item => {
+    const year = moment(item.date).format('YYYY');
+    const month = moment(item.date).format('MMMM'); // Полное имя месяца (например, June)
+
+    if (!groups[year]) groups[year] = {};
+    if (!groups[year][month]) groups[year][month] = [];
+    groups[year][month].push(item);
+  });
+
+  const sections = Object.keys(groups).map(year => ({
+    title: year,
+    data: Object.keys(groups[year]).map(month => ({
+      month,
+      data: groups[year][month],
+    })),
+  }));
+
+  return sections;
+};
+
 export default function TabOneScreen() {
   const expensesList: ListRenderItem<ItemExpenses> = ({ item, index }) => {
     return (
@@ -49,9 +72,24 @@ export default function TabOneScreen() {
     )
   }
 
+  const renderMonth = ({ item }: any) => (
+    <View style={styles.monthSection}>
+      <Text style={styles.monthTitle}>{item.month}</Text>
+      {item.data.map((exp: any, i: number) => (
+        <View key={exp.date + i} style={styles.item}>
+          <View style={styles.itemName}>
+            <Text style={styles.categoryName}>{exp.category}</Text>
+            <Text style={styles.date}>{moment(exp.date).format('DD/MM/YYYY')}</Text>
+          </View>
+          <Text style={styles.amount}>{exp.amount.toFixed(2)}</Text>
+        </View>
+      ))}
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      <FlatList
+      {/* <FlatList
         data={expenses}
         renderItem={expensesList}
         keyExtractor={item => item.date}
@@ -62,6 +100,15 @@ export default function TabOneScreen() {
             />
           ))
         }
+      /> */}
+      <SectionList
+        sections={groupedExpenses()}
+        keyExtractor={(item, index) => index.toString()}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text style={styles.yearTitle}>{title}</Text>
+        )}
+        renderItem={renderMonth}
+        stickySectionHeadersEnabled={false}
       />
     </View>
   );
@@ -76,6 +123,23 @@ const styles = StyleSheet.create({
   },
   itemName: {
     flex: 1,
+  },
+  yearTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#222',
+    marginTop: 20,
+    marginBottom: 8,
+  },
+  monthSection: {
+    marginBottom: 10,
+  },
+  monthTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#444',
+    marginTop: 10,
+    marginBottom: 4,
   },
   categoryName: {
     fontSize: 18,
