@@ -1,14 +1,19 @@
-import { FlatList, SectionList, StyleSheet, ListRenderItem } from 'react-native';
+import { SectionList, StyleSheet } from 'react-native';
 import moment from 'moment';
 import "react-native-devsettings";
 
-import EditScreenInfo from '@/components/EditScreenInfo';
+//import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 
 type ItemExpenses = {
   amount: number;
   category: string;
   date: string;
+};
+
+type MonthGroup = {
+  month: string;
+  data: ItemExpenses[];
 };
 
 const expenses: ItemExpenses[] = [
@@ -34,73 +39,61 @@ const expenses: ItemExpenses[] = [
   }
 ]
 
-const groupedExpenses = () => {
-  const groups: Record<string, Record<string, ItemExpenses[]>> = {};
-
-  expenses.forEach(item => {
-    const year = moment(item.date).format('YYYY');
-    const month = moment(item.date).format('MMMM'); // Полное имя месяца (например, June)
-
-    if (!groups[year]) groups[year] = {};
-    if (!groups[year][month]) groups[year][month] = [];
-    groups[year][month].push(item);
-  });
-
-  const sections = Object.keys(groups).map(year => ({
-    title: year,
-    data: Object.keys(groups[year]).map(month => ({
-      month,
-      data: groups[year][month],
-    })),
-  }));
-
-  return sections;
-};
-
 export default function TabOneScreen() {
-  const expensesList: ListRenderItem<ItemExpenses> = ({ item, index }) => {
-    return (
-      <View
-        style={styles.item}
-      >
-        <View style={styles.itemName}>
-          <Text style={styles.categoryName}>{item.category}</Text>
-          <Text style={styles.date}>{moment(item.date).format('DD/MM/YYYY')}</Text>
-        </View>
-        <Text style={styles.amount}>{item.amount.toFixed(2)}</Text>
-      </View>
-    )
-  }
 
-  const renderMonth = ({ item }: any) => (
-    <View style={styles.monthSection}>
-      <Text style={styles.monthTitle}>{item.month}</Text>
-      {item.data.map((exp: any, i: number) => (
-        <View key={exp.date + i} style={styles.item}>
-          <View style={styles.itemName}>
-            <Text style={styles.categoryName}>{exp.category}</Text>
-            <Text style={styles.date}>{moment(exp.date).format('DD/MM/YYYY')}</Text>
-          </View>
-          <Text style={styles.amount}>{exp.amount.toFixed(2)}</Text>
-        </View>
-      ))}
+  const groupedExpenses = () => {
+    const groups: Record<string, Record<string, ItemExpenses[]>> = {};
+  
+    expenses.forEach(item => {
+      const year = moment(item.date).format('YYYY');
+      const month = moment(item.date).format('MMMM');
+  
+      if (!groups[year]) groups[year] = {};
+      if (!groups[year][month]) groups[year][month] = [];
+      groups[year][month].push(item);
+    });
+  
+    const sections = Object.keys(groups).map(year => ({
+      title: year,
+      data: Object.keys(groups[year]).map(month => ({
+        month,
+        data: groups[year][month],
+      })),
+    }));
+  
+    return sections;
+  };
+
+  const expensesList = (item: ItemExpenses, index: number) => (
+    <View
+      key={item.date + index}
+      style={[styles.item, styles.containerText]}
+    >
+      <View style={styles.itemName}>
+        <Text style={styles.categoryName}>{item.category}</Text>
+        <Text style={styles.date}>{moment(item.date).format('DD/MM/YYYY')}</Text>
+      </View>
+      <Text style={styles.amount}>{item.amount.toFixed(2)}</Text>
     </View>
   );
 
+  const renderMonth = ({ item }: { item: MonthGroup }) => {
+    const summ = item.data.reduce((a, b) => a + b.amount, 0);
+
+    return (
+      <>
+        <View style={[styles.monthTitleContainer, styles.containerText]}>
+          <Text style={styles.monthTitle}>{item.month}</Text>
+          <Text style={styles.monthTitle}>{summ.toFixed(2)}</Text>
+        </View>
+        {item.data.map((exp: ItemExpenses, i: number) => 
+          expensesList(exp, i)
+        )}
+      </>
+    )};
+
   return (
     <View style={styles.container}>
-      {/* <FlatList
-        data={expenses}
-        renderItem={expensesList}
-        keyExtractor={item => item.date}
-        ItemSeparatorComponent={
-          (({highlighted}) => (
-            <View
-              style={[styles.separator]}
-            />
-          ))
-        }
-      /> */}
       <SectionList
         sections={groupedExpenses()}
         keyExtractor={(item, index) => index.toString()}
@@ -117,8 +110,8 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   item: {
     flexDirection: 'row',
-    paddingTop: 15,
-    paddingBottom: 15,
+    paddingTop: 10,
+    paddingBottom: 10,
     alignItems: 'center',
   },
   itemName: {
@@ -127,27 +120,32 @@ const styles = StyleSheet.create({
   yearTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#222',
+    color: '#323232',
     marginTop: 20,
     marginBottom: 8,
+    textAlign: "center"
   },
-  monthSection: {
-    marginBottom: 10,
+  monthTitleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+    borderTopColor: '#DDDDDD',
+    borderTopWidth: 1,
+    borderBottomColor: '#DDDDDD',
+    borderBottomWidth: 1,
   },
   monthTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#444',
-    marginTop: 10,
-    marginBottom: 4,
+    fontWeight: '700',
+    color: '#323232',
   },
   categoryName: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: '400',
     color: 'rgb(40 40 40)'
   },
   amount: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '500',
     color: 'rgb(40 40 40)'
   },
@@ -158,6 +156,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  containerText: {
     paddingLeft: 15,
     paddingRight: 15,
   },
