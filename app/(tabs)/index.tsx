@@ -1,4 +1,4 @@
-import { SectionList, StyleSheet } from 'react-native';
+import { SectionList, StyleSheet, SafeAreaView } from 'react-native';
 import moment from 'moment';
 import "react-native-devsettings";
 
@@ -94,6 +94,7 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
+      <SafeAreaView/>
       <SectionList
         sections={groupedExpenses()}
         keyExtractor={(item, index) => index.toString()}
@@ -121,8 +122,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     color: '#323232',
-    marginTop: 20,
-    marginBottom: 8,
+    marginVertical: 15,
     textAlign: "center"
   },
   monthTitleContainer: {

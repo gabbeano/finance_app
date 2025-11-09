@@ -20,7 +20,10 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs tabBar={props => <TabBar {...props}/>} />
+    <Tabs 
+      tabBar={props => <TabBar {...props}/>}
+      screenOptions={{ headerShown: false }}
+    />
   )
 
   return (
